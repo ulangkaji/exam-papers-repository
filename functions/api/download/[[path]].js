@@ -4,7 +4,9 @@ export async function onRequestGet(context) {
   // We use 'path' here because the filename is [[path]].js
   // The join('/') fixes the slashes that get split up
   const pathArray = context.params.path; 
-  const objectKey = pathArray.join('/'); 
+  // This converts "FINAL%20EXAM" back to "FINAL EXAM"
+  const objectKey = decodeURIComponent(pathArray.join('/'));
+
 
   const object = await bucket.get(objectKey);
 
@@ -21,3 +23,4 @@ export async function onRequestGet(context) {
 
   return new Response(object.body, { headers });
 }
+
