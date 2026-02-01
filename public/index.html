@@ -5,43 +5,111 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kertas Peperiksaan</title>
     <style>
-        body { font-family: sans-serif; max-width: 800px; margin: 2rem auto; padding: 0 1rem; }
-        .paper-card { border: 1px solid #ddd; padding: 1rem; margin-bottom: 0.5rem; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; }
-        .download-btn { background: #0070f3; color: white; text-decoration: none; padding: 0.5rem 1rem; border-radius: 4px; }
-        .download-btn:hover { background: #0051a2; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; max-width: 800px; margin: 2rem auto; padding: 0 1rem; color: #333; }
+        h1 { display: flex; align-items: center; gap: 10px; }
+        .breadcrumb { background: #f4f4f5; padding: 10px; border-radius: 6px; margin-bottom: 20px; font-family: monospace; }
+        .item-card { border: 1px solid #e4e4e7; padding: 1rem; margin-bottom: 0.5rem; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; transition: background 0.2s; }
+        .item-card:hover { background: #fafafa; }
+        
+        /* Icons */
+        .icon { margin-right: 10px; font-size: 1.2rem; }
+        
+        /* Buttons */
+        .btn-group { display: flex; gap: 10px; }
+        .btn { text-decoration: none; padding: 0.5rem 1rem; border-radius: 4px; font-size: 0.9rem; cursor: pointer; border: none; }
+        .btn-primary { background: #0070f3; color: white; }
+        .btn-secondary { background: #e4e4e7; color: #333; }
+        .btn:hover { opacity: 0.9; }
+        
+        .folder-link { cursor: pointer; color: #0070f3; font-weight: bold; flex-grow: 1; }
+        .folder-link:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
     <h1>📚 Kertas Peperiksaan</h1>
-    <div id="paper-list">Loading papers...</div>
+    
+    <div class="breadcrumb">
+        <button id="back-btn" class="btn btn-secondary" style="display:none; margin-right:10px;">⬅ Back</button>
+        <span id="current-path">/</span>
+    </div>
+
+    <div id="list-container">Loading...</div>
 
     <script>
-        async function loadPapers() {
+        // Track where we are
+        let currentPrefix = '';
+
+        async function loadContent(prefix = '') {
+            currentPrefix = prefix;
+            const container = document.getElementById('list-container');
+            const pathDisplay = document.getElementById('current-path');
+            const backBtn = document.getElementById('back-btn');
+
+            // Update UI Header
+            pathDisplay.innerText = prefix ? '/' + prefix : '/';
+            backBtn.style.display = prefix ? 'inline-block' : 'none';
+
+            container.innerHTML = '<p>Loading...</p>';
+
             try {
-                const response = await fetch('/api/papers');
-                const papers = await response.json();
-                const container = document.getElementById('paper-list');
+                // Fetch with the prefix
+                const res = await fetch(`/api/papers?prefix=${encodeURIComponent(prefix)}`);
+                const items = await res.json();
+                
                 container.innerHTML = '';
 
-                if (papers.length === 0) {
-                    container.innerHTML = '<p>No papers found.</p>';
+                if (items.length === 0) {
+                    container.innerHTML = '<p>This folder is empty.</p>';
                     return;
                 }
 
-                papers.forEach(paper => {
+                items.forEach(item => {
                     const div = document.createElement('div');
-                    div.className = 'paper-card';
-                    div.innerHTML = `
-                        <div><strong>${paper.name}</strong></div>
-                        <a href="${paper.url}" class="download-btn" download>Download</a>
-                    `;
+                    div.className = 'item-card';
+
+                    if (item.type === 'folder') {
+                        // RENDER FOLDER
+                        // Remove the trailing slash for display name
+                        const displayName = item.name.replace(prefix, '').replace('/', '');
+                        div.innerHTML = `
+                            <div class="folder-link" onclick="loadContent('${item.name}')">
+                                <span class="icon">📁</span> ${displayName}
+                            </div>
+                        `;
+                    } else {
+                        // RENDER FILE
+                        // Link logic: [[path]].js handles the slashes
+                        const downloadLink = `/api/download/${item.fullPath}`;
+                        div.innerHTML = `
+                            <div>
+                                <span class="icon">📄</span> <strong>${item.name}</strong>
+                            </div>
+                            <div class="btn-group">
+                                <a href="${downloadLink}" class="btn btn-secondary" target="_blank">Preview</a>
+                                <a href="${downloadLink}" class="btn btn-primary" download>Download</a>
+                            </div>
+                        `;
+                    }
                     container.appendChild(div);
                 });
+
             } catch (err) {
-                document.getElementById('paper-list').innerText = 'Error loading papers.';
+                console.error(err);
+                container.innerHTML = '<p style="color:red">Error loading content.</p>';
             }
         }
-        loadPapers();
+
+        // Back Button Logic
+        document.getElementById('back-btn').addEventListener('click', () => {
+            // Remove the last folder from the prefix
+            const parts = currentPrefix.split('/').filter(p => p); // split by / and remove empty strings
+            parts.pop(); // remove last folder
+            const newPrefix = parts.length > 0 ? parts.join('/') + '/' : '';
+            loadContent(newPrefix);
+        });
+
+        // Initial Load
+        loadContent();
     </script>
 </body>
 </html>
