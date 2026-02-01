@@ -1,9 +1,10 @@
 export async function onRequestGet(context) {
   const bucket = context.env.EXAM_BUCKET;
-  
-  // Reconstruct the full path (e.g., "LAW240/Exam.pdf") from the URL segments
+
+  // We use 'path' here because the filename is [[path]].js
+  // The join('/') fixes the slashes that get split up
   const pathArray = context.params.path; 
-  const objectKey = pathArray.join('/');
+  const objectKey = pathArray.join('/'); 
 
   const object = await bucket.get(objectKey);
 
@@ -15,7 +16,7 @@ export async function onRequestGet(context) {
   object.writeHttpMetadata(headers);
   headers.set('etag', object.httpEtag);
   
-  // "inline" allows the browser to Preview the PDF instead of downloading it immediately
+  // This line makes the "Preview" work!
   headers.set('Content-Disposition', `inline; filename="${pathArray[pathArray.length - 1]}"`);
 
   return new Response(object.body, { headers });
