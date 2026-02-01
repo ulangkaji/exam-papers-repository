@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kertas Peperiksaan</title>
+    <style>
+        body { font-family: sans-serif; max-width: 800px; margin: 2rem auto; padding: 0 1rem; }
+        .paper-card { border: 1px solid #ddd; padding: 1rem; margin-bottom: 0.5rem; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; }
+        .download-btn { background: #0070f3; color: white; text-decoration: none; padding: 0.5rem 1rem; border-radius: 4px; }
+        .download-btn:hover { background: #0051a2; }
+    </style>
+</head>
+<body>
+    <h1>📚 Kertas Peperiksaan</h1>
+    <div id="paper-list">Loading papers...</div>
+
+    <script>
+        async function loadPapers() {
+            try {
+                const response = await fetch('/api/papers');
+                const papers = await response.json();
+                const container = document.getElementById('paper-list');
+                container.innerHTML = '';
+
+                if (papers.length === 0) {
+                    container.innerHTML = '<p>No papers found.</p>';
+                    return;
+                }
+
+                papers.forEach(paper => {
+                    const div = document.createElement('div');
+                    div.className = 'paper-card';
+                    div.innerHTML = `
+                        <div><strong>${paper.name}</strong></div>
+                        <a href="${paper.url}" class="download-btn" download>Download</a>
+                    `;
+                    container.appendChild(div);
+                });
+            } catch (err) {
+                document.getElementById('paper-list').innerText = 'Error loading papers.';
+            }
+        }
+        loadPapers();
+    </script>
+</body>
+</html>
