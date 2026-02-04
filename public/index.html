@@ -3,37 +3,186 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kertas Peperiksaan UiTM (For Private Use)</title>
+    <title>Kertas Peperiksaan UiTM</title>
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; max-width: 800px; margin: 2rem auto; padding: 0 1rem; color: #333; }
-        h1 { display: flex; align-items: center; gap: 10px; }
-        .breadcrumb { background: #f4f4f5; padding: 10px; border-radius: 6px; margin-bottom: 20px; font-family: monospace; }
-        .item-card { border: 1px solid #e4e4e7; padding: 1rem; margin-bottom: 0.5rem; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; transition: background 0.2s; }
-        .item-card:hover { background: #fafafa; }
-        
-        /* Icons */
-        .icon { margin-right: 10px; font-size: 1.2rem; }
-        
+        /* General Reset & Layout */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #ffffff;
+            color: #333;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        header {
+            margin-bottom: 2rem;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Breadcrumb Bar */
+        .breadcrumb {
+            background-color: #f3f4f6; /* Light gray background */
+            padding: 12px 20px;
+            border-radius: 6px;
+            margin-bottom: 30px;
+            font-family: monospace;
+            font-size: 1rem;
+            color: #555;
+            display: flex;
+            align-items: center;
+        }
+
+        /* Content Area */
+        #list-container {
+            flex: 1; /* Pushes footer to bottom if content is short */
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        /* Card Styling (The Box Look) */
+        .item-card {
+            background: #ffffff;
+            border: 1px solid #e5e7eb; /* Subtle border */
+            border-radius: 8px;
+            padding: 1.2rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+
+        .item-card:hover {
+            border-color: #2563eb;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        /* Folder Specific Styles */
+        .folder-content {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-grow: 1;
+        }
+
+        .folder-icon {
+            font-size: 1.5rem;
+            color: #fbbf24; /* Folder Yellow */
+        }
+
+        .folder-name {
+            color: #2563eb; /* UiTM Blueish Link Color */
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        /* File Specific Styles */
+        .file-name {
+            color: #374151;
+            font-weight: 500;
+        }
+
         /* Buttons */
-        .btn-group { display: flex; gap: 10px; }
-        .btn { text-decoration: none; padding: 0.5rem 1rem; border-radius: 4px; font-size: 0.9rem; cursor: pointer; border: none; }
-        .btn-primary { background: #0070f3; color: white; }
-        .btn-secondary { background: #e4e4e7; color: #333; }
-        .btn:hover { opacity: 0.9; }
+        .btn-group {
+            display: flex;
+            gap: 10px;
+        }
         
-        .folder-link { cursor: pointer; color: #0070f3; font-weight: bold; flex-grow: 1; }
-        .folder-link:hover { text-decoration: underline; }
+        .btn {
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary { background: #2563eb; color: white; }
+        .btn-secondary { background: #f3f4f6; color: #374151; }
+        .btn:hover { opacity: 0.9; }
+
+        /* Footer Section */
+        footer {
+            margin-top: 4rem;
+            padding-top: 2rem;
+            border-top: 1px solid #f3f4f6; /* Optional divider */
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .footer-text {
+            text-align: right;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            color: #111;
+        }
+
+        .footer-small {
+            color: #666;
+            font-size: 0.85rem;
+        }
+
+        /* Responsive Fix for Footer */
+        @media (max-width: 600px) {
+            footer {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+            .footer-text { text-align: center; }
+        }
     </style>
 </head>
 <body>
-    <h1>📚 Kertas Peperiksaan</h1>
+
+    <header>
+        <h1><span style="font-size: 1.2em;">📚</span> Kertas Peperiksaan</h1>
+    </header>
     
     <div class="breadcrumb">
-        <button id="back-btn" class="btn btn-secondary" style="display:none; margin-right:10px;">⬅ Back</button>
+        <button id="back-btn" class="btn btn-secondary" style="display:none; margin-right:15px; padding: 4px 10px;">⬅ Back</button>
         <span id="current-path">/</span>
     </div>
 
-    <div id="list-container">Loading...</div>
+    <div id="list-container">
+        <p style="color:#888;">Loading content...</p>
+    </div>
+
+    <footer>
+        <div class="widget-container">
+            <iframe id="mst_widget" title="MST Widget" width="350" height="120" 
+                style="-webkit-box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.1);-moz-box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.1);box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.1);border: 1px solid #eee; border-radius: 8px;" 
+                src="https://mst.sirim.my/widget">
+            </iframe>
+        </div>
+
+        <div class="footer-text">
+            <div>For use of MAC1103E students.</div>
+            <div>Sharing/Distributing of the files MAY be prohibited by law.</div>
+            <div class="footer-small" style="margin-top: 5px;">Created by miji.</div>
+        </div>
+    </footer>
 
     <script>
         // Track where we are
@@ -49,17 +198,18 @@
             pathDisplay.innerText = prefix ? '/' + prefix : '/';
             backBtn.style.display = prefix ? 'inline-block' : 'none';
 
-            container.innerHTML = '<p>Loading...</p>';
+            container.innerHTML = '<p style="color:#666;">Loading...</p>';
 
             try {
                 // Fetch with the prefix
+                // NOTE: Ensure your backend /api/papers endpoint is running
                 const res = await fetch(`/api/papers?prefix=${encodeURIComponent(prefix)}`);
                 const items = await res.json();
                 
                 container.innerHTML = '';
 
                 if (items.length === 0) {
-                    container.innerHTML = '<p>This folder is empty.</p>';
+                    container.innerHTML = '<div style="padding:20px; color:#666;">This folder is empty.</div>';
                     return;
                 }
 
@@ -69,20 +219,21 @@
 
                     if (item.type === 'folder') {
                         // RENDER FOLDER
-                        // Remove the trailing slash for display name
                         const displayName = item.name.replace(prefix, '').replace('/', '');
+                        div.onclick = () => loadContent(item.name); // Click whole card to open
                         div.innerHTML = `
-                            <div class="folder-link" onclick="loadContent('${item.name}')">
-                                <span class="icon">📁</span> ${displayName}
+                            <div class="folder-content">
+                                <span class="folder-icon">📂</span> 
+                                <span class="folder-name">${displayName}</span>
                             </div>
                         `;
                     } else {
                         // RENDER FILE
-                        // Link logic: [[path]].js handles the slashes
                         const downloadLink = `/api/download/${item.fullPath}`;
                         div.innerHTML = `
-                            <div>
-                                <span class="icon">📄</span> <strong>${item.name}</strong>
+                            <div class="folder-content">
+                                <span class="folder-icon" style="color:#9ca3af">📄</span> 
+                                <span class="file-name">${item.name}</span>
                             </div>
                             <div class="btn-group">
                                 <a href="${downloadLink}" class="btn btn-secondary" target="_blank">Preview</a>
@@ -101,9 +252,8 @@
 
         // Back Button Logic
         document.getElementById('back-btn').addEventListener('click', () => {
-            // Remove the last folder from the prefix
-            const parts = currentPrefix.split('/').filter(p => p); // split by / and remove empty strings
-            parts.pop(); // remove last folder
+            const parts = currentPrefix.split('/').filter(p => p); 
+            parts.pop(); 
             const newPrefix = parts.length > 0 ? parts.join('/') + '/' : '';
             loadContent(newPrefix);
         });
@@ -113,4 +263,3 @@
     </script>
 </body>
 </html>
-
