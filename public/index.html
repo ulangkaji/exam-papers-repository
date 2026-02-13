@@ -213,8 +213,9 @@
                     return;
                 }
 
-// Define a mapping of filenames to their solution URLs
-                // You can add more here later!
+                // ==========================================
+                // SOLUTION MAPPING
+                // ==========================================
                 const solutionMap = {
                     "MAF201 PYQ JULY2025.pdf": "/solutions/MAF201_July2025_Solutions.html"
                 };
@@ -244,7 +245,7 @@
                                 <a href="${solutionMap[item.name]}" 
                                    class="btn" 
                                    target="_blank" 
-                                   style="background-color: #10b981; color: white; margin-right: 5px;">
+                                   style="background-color: #10b981; color: white;">
                                    Solution
                                 </a>
                             `;
@@ -257,33 +258,6 @@
                             </div>
                             <div class="btn-group">
                                 ${solutionButton}
-                                <a href="${downloadLink}" class="btn btn-secondary" target="_blank">Preview</a>
-                                <a href="${downloadLink}" class="btn btn-primary" download>Download</a>
-                            </div>
-                        `;
-                    }
-                    container.appendChild(div);
-                });
-
-                    if (item.type === 'folder') {
-                        // RENDER FOLDER
-                        const displayName = item.name.replace(prefix, '').replace('/', '');
-                        div.onclick = () => loadContent(item.name); // Click whole card to open
-                        div.innerHTML = `
-                            <div class="folder-content">
-                                <span class="folder-icon">📂</span> 
-                                <span class="folder-name">${displayName}</span>
-                            </div>
-                        `;
-                    } else {
-                        // RENDER FILE
-                        const downloadLink = `/api/download/${item.fullPath}`;
-                        div.innerHTML = `
-                            <div class="folder-content">
-                                <span class="folder-icon" style="color:#9ca3af">📄</span> 
-                                <span class="file-name">${item.name}</span>
-                            </div>
-                            <div class="btn-group">
                                 <a href="${downloadLink}" class="btn btn-secondary" target="_blank">Preview</a>
                                 <a href="${downloadLink}" class="btn btn-primary" download>Download</a>
                             </div>
@@ -311,4 +285,3 @@
     </script>
 </body>
 </html>
-
